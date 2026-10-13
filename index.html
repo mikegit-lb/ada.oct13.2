@@ -3383,80 +3383,158 @@ function buildHero(el) {
 
 // --- UNIT 4: Free Time ---
 const HOBBIES = [
-  ['playing chess', '♟️', 'satranç oynamak'],
-  ['playing table tennis', '🏓', 'masa tenisi oynamak'],
-  ['playing computer games', '🎮', 'bilgisayar oyunları oynamak'],
-  ['watching cartoons', '📺', 'çizgi film izlemek'],
-  ['reading comics', '📚', 'çizgi roman okumak'],
-  ['drawing', '✏️', 'resim çizmek'],
-  ['coloring', '🖍️', 'boyama yapmak'],
-  ['riding a horse', '🐎', 'ata binmek']
+  ['playing chess', '♟️', 'satranç oynamak', 'chessboard'],
+  ['playing table tennis', '🏓', 'masa tenisi oynamak', 'paddle'],
+  ['playing computer games', '🎮', 'bilgisayar oyunları oynamak', 'controller'],
+  ['watching cartoons', '📺', 'çizgi film izlemek', 'screen'],
+  ['reading comics', '📚', 'çizgi roman okumak', 'comic book'],
+  ['drawing', '✏️', 'resim çizmek', 'pencil'],
+  ['coloring', '🖍️', 'boyama yapmak', 'crayons'],
+  ['riding a horse', '🐎', 'ata binmek', 'horse & saddle'],
+  ['playing football', '⚽', 'futbol oynamak', 'football & goal'],
+  ['swimming', '🏊', 'yüzmek', 'goggles & pool'],
+  ['riding a bike', '🚲', 'bisiklete binmek', 'bicycle & helmet'],
+  ['playing the guitar', '🎸', 'gitar çalmak', 'guitar & notes'],
+  ['flying a kite', '🪁', 'uçurtma uçurmak', 'kite & sky'],
+  ['singing songs', '🎤', 'şarkı söylemek', 'microphone'],
+  ['doing puzzles', '🧩', 'yapboz yapmak', 'puzzle pieces'],
+  ['skateboarding', '🛹', 'kaykay kaymak', 'skateboard']
 ];
 
+/* --- UNIT 4: FRIEND INTERVIEWER & LIVE CLASSROOM SURVEY --- */
 function interviewer(el) {
   const ans = {};
+  let surveyData = [
+    { name: 'playing football', icon: '⚽', votes: 18, pct: 90 },
+    { name: 'swimming', icon: '🏊', votes: 17, pct: 85 },
+    { name: 'playing computer games', icon: '🎮', votes: 16, pct: 80 },
+    { name: 'riding a bike', icon: '🚲', votes: 15, pct: 75 },
+    { name: 'drawing', icon: '✏️', votes: 14, pct: 70 },
+    { name: 'playing the guitar', icon: '🎸', votes: 12, pct: 60 }
+  ];
+
   const draw = () => {
     const out = HOBBIES.filter(h => ans[h[0]]).map(h => ans[h[0]] === 1 ? `I like ${h[0]}.` : `I don't like ${h[0]}.`);
     el.innerHTML = `
-      <div class="space-y-3">
-        <p class="font-semibold text-slate-700">Tell the interviewer your personal hobbies! Tap 💚 (I like) or 💔 (I don't like):</p>
-        <div class="grid sm:grid-cols-2 gap-2.5">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h5 class="text-xl font-bold text-slate-800">🎤 Personal Hobby Interviewer & Live Survey</h5>
+            <p class="text-sm text-slate-600">Sevdiğin aktivitelere 💚 (I like), sevmediklerine 💔 (I don't like) dokun:</p>
+          </div>
+          <button type="button" class="chip !text-xs font-bold" id="ask-class-btn">🎲 Sınıfa Tekrar Sor (Re-survey)</button>
+        </div>
+
+        <!-- 16 Hobbies Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 max-h-[360px] overflow-y-auto pr-1">
           ${HOBBIES.map(h => `
-            <div class="flex items-center gap-2 card !border-2 p-2.5 bg-orange-50/50">
+            <div class="flex items-center gap-2 card !border-2 p-2.5 bg-orange-50/50 hover:bg-orange-50 transition">
               <span class="text-3xl">${h[1]}</span>
-              <div class="flex-1">
-                <div class="font-semibold text-slate-800">${h[0]}</div>
-                <div class="text-xs text-slate-500">${h[2]}</div>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-sm text-slate-800 truncate">${h[0]}</div>
+                <div class="text-[11px] text-slate-500 truncate">${h[2]}</div>
               </div>
-              <button class="chip ${ans[h[0]] === 1 ? 'sel' : ''}" data-h="${h[0]}" data-v="1" aria-label="like">💚</button>
-              <button class="chip ${ans[h[0]] === 2 ? 'sel' : ''}" data-h="${h[0]}" data-v="2" aria-label="don't like">💔</button>
+              <div class="flex items-center gap-1">
+                <button type="button" class="chip !py-1 !px-2 text-sm ${ans[h[0]] === 1 ? '!bg-emerald-500 !text-white' : ''}" data-h="${h[0]}" data-v="1" title="I like">💚</button>
+                <button type="button" class="chip !py-1 !px-2 text-sm ${ans[h[0]] === 2 ? '!bg-rose-500 !text-white' : ''}" data-h="${h[0]}" data-v="2" title="I don't like">💔</button>
+              </div>
             </div>
           `).join('')}
         </div>
-        <div class="card p-3 space-y-1 min-h-[60px] bg-white">
-          ${out.length ? out.map(s => bub(s, 1)).join('<br>') : '<span class="opacity-60 text-sm">Tap green or red hearts to build your sentences…</span>'}
+
+        <!-- Real-Time Speech Bubble Sentences -->
+        <div class="card p-3.5 space-y-1.5 min-h-[64px] bg-white border-2 border-orange-200">
+          <div class="text-xs uppercase font-extrabold text-orange-900 tracking-wider mb-1">💬 OLUŞTURULAN CÜMLELERİN:</div>
+          ${out.length ? out.map(s => bub(s, 1)).join('<br>') : '<span class="opacity-60 text-sm">Kalplere dokunarak cümlelerini oluşturmaya başla…</span>'}
         </div>
-        <div class="flex gap-2">
-          <button class="btn" id="all">🔊 Read All My Sentences</button>
+
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <button type="button" class="btn !bg-orange-600 font-bold" id="all-sent-btn">🔊 Tüm Cümlelerimi Oku</button>
+          <span class="text-xs text-slate-500 font-semibold">${Object.keys(ans).length} / ${HOBBIES.length} hobi seçildi</span>
+        </div>
+
+        <!-- Live Classroom Survey Bar Chart -->
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-2xl border-2 border-orange-300 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-extrabold text-orange-950 uppercase tracking-wide">📊 20 Kişilik Sınıf Anketi (Class Survey Results):</span>
+            <span class="text-xs text-slate-600 font-medium">"What do you like doing in your free time?"</span>
+          </div>
+          <div class="space-y-2">
+            ${surveyData.map(d => `
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                  <span class="flex items-center gap-1.5"><span>${d.icon}</span> <span>${d.name}</span></span>
+                  <span class="text-orange-900">${d.votes} kişi (%${d.pct})</span>
+                </div>
+                <div class="w-full bg-white h-3 rounded-full overflow-hidden border border-orange-200 shadow-inner">
+                  <div class="bg-gradient-to-r from-amber-400 to-orange-500 h-full rounded-full transition-all duration-700" style="width:${d.pct}%"></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       </div>`;
+
     $$('[data-h]', el).forEach(b => b.onclick = () => {
       ans[b.dataset.h] = +b.dataset.v;
       sfx.tick();
       say(+b.dataset.v === 1 ? `I like ${b.dataset.h}.` : `I don't like ${b.dataset.h}.`);
       const had = ans.__d;
       draw();
-      if (!had && HOBBIES.every(h => ans[h[0]])) {
+      if (!had && Object.keys(ans).length >= 6) {
         ans.__d = 1;
-        game();
+        game(2);
       }
     });
-    $('#all', el).onclick = () => say(out.join(' '));
+
+    const allBtn = $('#all-sent-btn', el);
+    if (allBtn) allBtn.onclick = () => say(out.join(' '));
+
+    const askBtn = $('#ask-class-btn', el);
+    if (askBtn) askBtn.onclick = () => {
+      sfx.ok();
+      surveyData = shuffle([...surveyData]).map(d => {
+        const v = rnd(10, 20);
+        return { ...d, votes: v, pct: Math.round((v / 20) * 100) };
+      });
+      say('Class survey updated! Great job asking your classmates!');
+      draw();
+    };
   };
+
   draw();
 }
 
+/* --- UNIT 4: 16-SECTOR LUCKY HOBBY WHEEL --- */
 function wheel(el) {
   const N = HOBBIES.length;
-  const cols = ['#fb7185', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#22d3ee', '#818cf8', '#e879f9'];
+  const cols = [
+    '#fb7185', '#fb923c', '#fbbf24', '#a3e635',
+    '#34d399', '#22d3ee', '#818cf8', '#e879f9',
+    '#f43f5e', '#f97316', '#eab308', '#84cc16',
+    '#10b981', '#06b6d4', '#6366f1', '#d946ef'
+  ];
   const sl = HOBBIES.map((h, i) => {
     const a0 = i * 2 * Math.PI / N, a1 = (i + 1) * 2 * Math.PI / N;
     const x0 = 100 + 95 * Math.sin(a0), y0 = 100 - 95 * Math.cos(a0);
     const x1 = 100 + 95 * Math.sin(a1), y1 = 100 - 95 * Math.cos(a1);
     const am = (a0 + a1) / 2;
     return `
-      <path d="M100 100 L${x0} ${y0} A95 95 0 0 1 ${x1} ${y1}Z" fill="${cols[i]}" stroke="#fff" stroke-width="2"/>
-      <text x="${100 + 68 * Math.sin(am)}" y="${106 - 68 * Math.cos(am)}" text-anchor="middle" font-size="22">${h[1]}</text>`;
+      <path d="M100 100 L${x0} ${y0} A95 95 0 0 1 ${x1} ${y1}Z" fill="${cols[i]}" stroke="#fff" stroke-width="1.5"/>
+      <text x="${100 + 72 * Math.sin(am)}" y="${105 - 72 * Math.cos(am)}" text-anchor="middle" font-size="15">${h[1]}</text>`;
   }).join('');
   el.innerHTML = `
-    <div class="text-center space-y-3">
-      <p class="font-semibold text-slate-700">Spin the wheel and practice answering out loud!</p>
-      <div class="relative w-60 mx-auto">
-        <div class="absolute left-1/2 -top-3 -translate-x-1/2 text-3xl z-10">🔻</div>
-        <svg id="w" viewBox="0 0 200 200" class="w-60 h-60" style="transition:transform 3s cubic-bezier(.2,.8,.2,1)" role="img" aria-label="Hobby wheel">${sl}</svg>
+    <div class="text-center space-y-4">
+      <div class="space-y-1">
+        <h5 class="text-xl font-bold text-slate-800">🎡 16-Hobby Lucky Wheel of Fortune (Çarkıfelek)</h5>
+        <p class="font-semibold text-slate-600 text-sm">Çarkı çevir, gelen aktivite sorusunu sesli cevapla!</p>
       </div>
-      <div><button class="btn text-lg" id="sp">🎡 Spin Wheel!</button></div>
-      <div id="res" class="text-center space-y-2" aria-live="polite"></div>
+      <div class="relative w-64 mx-auto drop-shadow-xl">
+        <div class="absolute left-1/2 -top-3 -translate-x-1/2 text-3xl z-10 animate-bounce">🔻</div>
+        <svg id="w" viewBox="0 0 200 200" class="w-64 h-64 select-none" style="transition:transform 3.5s cubic-bezier(.2,.8,.2,1)" role="img" aria-label="16 Hobby wheel">${sl}</svg>
+      </div>
+      <div><button type="button" class="btn !bg-orange-600 text-lg font-bold shadow-lg" id="sp">🎡 Çarkı Çevir (Spin Wheel!)</button></div>
+      <div id="res" class="text-center space-y-2 min-h-[90px]" aria-live="polite"></div>
     </div>`;
   let rot = 0, busy = false;
   $('#sp', el).onclick = () => {
@@ -3472,14 +3550,594 @@ function wheel(el) {
         <div class="text-5xl pop my-1">${h[1]}</div>
         ${bub(q)}
         <div class="flex gap-2 justify-center flex-wrap mt-2">
-          <button class="btn" data-say="Yes, I do. I like ${h[0]}.">Yes, I do. 💚</button>
-          <button class="btn btn-alt" data-say="No, I don't. I don't like ${h[0]}.">No, I don't. 💔</button>
+          <button type="button" class="btn !bg-emerald-600" data-say="Yes, I do. I like ${h[0]}.">Yes, I do. 💚</button>
+          <button type="button" class="btn btn-alt !bg-rose-600 !text-white" data-say="No, I don't. I don't like ${h[0]}.">No, I don't. 💔</button>
         </div>`;
       say(q);
       busy = false;
       if (!wheel.d) { wheel.d = 1; setTimeout(() => game(), 1500); }
-    }, 3100);
+    }, 3600);
   };
+}
+
+/* --- UNIT 4: 3-LESSON PRACTICE HUB (HİKAYE, EŞLEŞTİRME, BOŞLUK, CÜMLE KURMA) --- */
+function initUnit4PracticeHub(container) {
+  if (!container) return;
+  const cardEl = $('#u4-hub-card', container);
+  if (!cardEl) return;
+
+  let currentMode = 'reading';
+  const tabs = $$('.u4-hub-tab', container);
+
+  tabs.forEach(t => {
+    t.onclick = () => {
+      tabs.forEach(b => b.classList.remove('on'));
+      t.classList.add('on');
+      currentMode = t.dataset.mode;
+      renderMode();
+    };
+  });
+
+  function renderMode() {
+    if (currentMode === 'reading') renderReading();
+    else if (currentMode === 'matching') renderMatching();
+    else if (currentMode === 'sentence') renderSentence();
+    else if (currentMode === 'builder') renderBuilder();
+  }
+
+  /* --- TAB 1: STORY & 16 GAPS + 5 READING CHECK QUESTIONS --- */
+  function renderReading() {
+    const chars = [
+      { name: 'Mia', likes: 'reading comics', dislikes: 'playing chess', e: '📚' },
+      { name: 'Leo', likes: 'playing football', dislikes: 'coloring', e: '⚽' },
+      { name: 'Kenji', likes: 'swimming', dislikes: 'riding a horse', e: '🏊' },
+      { name: 'Sofia', likes: 'playing the guitar', dislikes: 'doing puzzles', e: '🎸' },
+      { name: 'Tom', likes: 'riding a bike', dislikes: 'singing songs', e: '🚲' },
+      { name: 'Chloe', likes: 'flying a kite', dislikes: 'watching cartoons', e: '🪁' },
+      { name: 'Mateo', likes: 'playing table tennis', dislikes: 'skateboarding', e: '🏓' },
+      { name: 'Emma', likes: 'drawing', dislikes: 'playing computer games', e: '🎨' }
+    ];
+
+    const gaps = [];
+    chars.forEach((c, cidx) => {
+      gaps.push({ slot: cidx * 2, ans: c.likes, filled: null });
+      gaps.push({ slot: cidx * 2 + 1, ans: c.dislikes, filled: null });
+    });
+
+    const bankWords = shuffle(gaps.map(g => g.ans));
+
+    const checkQs = [
+      { q: 'What does Mia like doing?', e: '📚', say: 'Mia likes reading comics.', o: ['Reading comics', 'Coloring pictures', 'Riding a horse'] },
+      { q: 'Which sport does Leo like playing?', e: '⚽', say: 'Leo likes playing football.', o: ['Playing football', 'Doing puzzles', 'Watching cartoons'] },
+      { q: 'What musical instrument does Sofia like playing?', e: '🎸', say: 'Sofia likes playing the guitar.', o: ['The guitar', 'The piano', 'The drums'] },
+      { q: 'Does Tom like riding a bike?', e: '🚲', say: 'Yes, he does. Tom likes riding a bike.', o: ['Yes, he does.', "No, he doesn't.", 'No, he is bike.'] },
+      { q: 'What outdoor activity does Chloe like on windy days?', e: '🪁', say: 'Chloe likes flying a kite.', o: ['Flying a kite', 'Playing chess', 'Drawing cartoons'] }
+    ];
+
+    function drawStory() {
+      cardEl.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h5 class="text-xl font-bold text-orange-950">📖 The Weekend Hobby Club (Hafta Sonu Hobi Kulübü Hikayesi)</h5>
+              <p class="text-sm text-slate-600">8 arkadaşın sevdikleri ve sevmedikleri hobileri Word Bank'tan seçerek boşluklara yerleştir:</p>
+            </div>
+            <button type="button" class="btn !bg-orange-600 text-sm font-bold" id="u4-story-read-btn">🔊 Tüm Hikayeyi Oku</button>
+          </div>
+
+          <!-- Story Passage Grid -->
+          <div class="p-4 md:p-5 bg-white rounded-2xl border-2 border-orange-300 shadow-sm leading-relaxed text-slate-800 space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${chars.map((c, cidx) => {
+                const g1 = gaps[cidx * 2];
+                const g2 = gaps[cidx * 2 + 1];
+                return `
+                  <div class="p-3 bg-orange-50/60 rounded-xl border border-orange-200 space-y-1.5">
+                    <div class="flex items-center gap-2 font-bold text-orange-950 text-base">
+                      <span class="text-2xl">${c.e}</span>
+                      <span>${c.name}'s Hobbies:</span>
+                    </div>
+                    <div class="text-sm">
+                      "I like 
+                      <span class="gap-slot cursor-pointer px-2 py-0.5 rounded-lg border-2 border-dashed font-bold inline-block min-w-[110px] text-center ${g1.filled ? 'bg-orange-100 border-orange-500 text-orange-950' : 'bg-white border-orange-400 text-slate-400'}" data-slot="${cidx * 2}">
+                        ${g1.filled || '___ (like)'}
+                      </span>, 
+                      but I don't like 
+                      <span class="gap-slot cursor-pointer px-2 py-0.5 rounded-lg border-2 border-dashed font-bold inline-block min-w-[110px] text-center ${g2.filled ? 'bg-orange-100 border-orange-500 text-orange-950' : 'bg-white border-orange-400 text-slate-400'}" data-slot="${cidx * 2 + 1}">
+                        ${g2.filled || '___ (dislike)'}
+                      </span>."
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Word Bank Box -->
+          <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-300">
+            <div class="flex items-center justify-between mb-2 flex-wrap gap-1">
+              <span class="text-sm font-extrabold text-amber-900 uppercase tracking-wide">📦 Word Bank (Boşluklara eklemek için dokun):</span>
+              <span class="text-xs text-slate-500 font-semibold">Dolu kutucuğa tıklayarak geri alabilirsin.</span>
+            </div>
+            <div class="flex flex-wrap gap-2" id="u4-word-bank">
+              ${bankWords.map((w, widx) => {
+                const used = gaps.some(g => g.filled === w);
+                return `
+                  <button type="button" class="chip !text-sm font-bold u4-bank-chip ${used ? 'dim' : ''}" data-word="${w}">
+                    ${w}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Action buttons and Feedback -->
+          <div class="flex items-center justify-between flex-wrap gap-3 pt-1">
+            <button type="button" class="btn !bg-emerald-600 text-lg font-bold" id="check-u4-reading-btn">Boşlukları Kontrol Et ✅</button>
+            <div id="u4-reading-fb" class="text-base font-bold"></div>
+          </div>
+
+          <!-- 5 Story Comprehension Questions -->
+          <div class="mt-6 p-5 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border-2 border-orange-300 space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-orange-200">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">❓</span>
+                <div>
+                  <h6 class="font-extrabold text-orange-950 text-lg">Hobby Story Check Questions (Okuduğunu Anlama Soruları)</h6>
+                  <p class="text-xs text-slate-600 font-semibold">Hikayedeki karakterlerin hobi tercihlerine göre doğru cevabı seç:</p>
+                </div>
+              </div>
+              <span class="chip !bg-amber-100 !border-amber-400 text-xs font-bold" id="u4-rc-score-badge">Doğru: 0 / ${checkQs.length}</span>
+            </div>
+
+            <div class="space-y-3">
+              ${checkQs.map((cq, cqidx) => `
+                <div class="bg-white p-4 rounded-xl border border-orange-200 space-y-2 u4-cq-card" data-cqidx="${cqidx}">
+                  <div class="flex items-center gap-2 font-bold text-base text-slate-800">
+                    <span class="scale-110">${cq.e}</span>
+                    <span>${cqidx + 1}. ${cq.q}</span>
+                    <button type="button" class="chip !py-0.5 !px-2 text-xs ml-auto" data-say="${esc(cq.say)}">🔊 Dinle</button>
+                  </div>
+                  <div class="grid sm:grid-cols-3 gap-2">
+                    ${shuffle(cq.o.map((opt, oidx) => ({ text: opt, ok: oidx === 0 }))).map(opt => `
+                      <button type="button" class="opt !py-2 !px-3 text-sm font-bold u4-cq-opt-btn" data-ok="${opt.ok ? 1 : 0}">
+                        ${opt.text}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Word bank click
+      $$('.u4-bank-chip:not(.dim)', cardEl).forEach(btn => {
+        btn.onclick = () => {
+          const w = btn.dataset.word;
+          const empty = gaps.find(g => !g.filled);
+          if (empty) {
+            empty.filled = w;
+            sfx.tick();
+            say(w);
+            drawStory();
+          } else {
+            toast('Tüm boşluklar dolu! Değiştirmek istediğin boşluğa tıkla.');
+          }
+        };
+      });
+
+      // Gap slot click
+      $$('.gap-slot', cardEl).forEach(slot => {
+        slot.onclick = () => {
+          const sIdx = parseInt(slot.dataset.slot, 10);
+          if (gaps[sIdx].filled) {
+            gaps[sIdx].filled = null;
+            sfx.tick();
+            drawStory();
+          }
+        };
+      });
+
+      // Check Button
+      $('#check-u4-reading-btn', cardEl).onclick = () => {
+        let correctCount = 0;
+        gaps.forEach((g, gIdx) => {
+          const slotEl = $(`[data-slot="${gIdx}"]`, cardEl);
+          if (g.filled === g.ans) {
+            correctCount++;
+            slotEl.classList.remove('border-dashed', 'border-orange-400', 'bg-rose-100', 'border-rose-400');
+            slotEl.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-950');
+          } else {
+            slotEl.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-950');
+          }
+        });
+
+        const fb = $('#u4-reading-fb', cardEl);
+        if (correctCount === gaps.length) {
+          fb.innerHTML = `<span class="text-emerald-700">🎉 Mükemmel! 16 boşluğun tümü doğru! ⭐ +2 Stars!</span>`;
+          sfx.ok();
+          game(2);
+        } else {
+          fb.innerHTML = `<span class="text-rose-700">❌ ${correctCount}/${gaps.length} doğru. Kırmızı kutuları kontrol et ve tekrar dene!</span>`;
+          sfx.no();
+        }
+      };
+
+      // Comprehension Questions
+      let cqScore = 0;
+      $$('.u4-cq-card', cardEl).forEach(card => {
+        const btns = $$('.u4-cq-opt-btn', card);
+        btns.forEach(btn => {
+          btn.onclick = () => {
+            btns.forEach(b => b.disabled = true);
+            const isOk = btn.dataset.ok === '1';
+            if (isOk) {
+              btn.classList.add('good');
+              sfx.ok();
+              cqScore++;
+              $('#u4-rc-score-badge', cardEl).textContent = `Doğru: ${cqScore} / ${checkQs.length}`;
+              game();
+            } else {
+              btn.classList.add('bad');
+              sfx.no();
+              btns.forEach(b => {
+                if (b.dataset.ok === '1') b.classList.add('good');
+              });
+            }
+          };
+        });
+      });
+
+      // Read Full Story
+      $('#u4-story-read-btn', cardEl).onclick = () => {
+        const fullStory = chars.map(c => `${c.name} likes ${c.likes}, but dislikes ${c.dislikes}.`).join(' ');
+        say(fullStory);
+      };
+    }
+
+    drawStory();
+  }
+
+  /* --- TAB 2: HOBBY & TOOL MATCHER --- */
+  function renderMatching() {
+    const pairs = [
+      { id: 'chess', act: 'playing chess', icon: '♟️', tool: 'Chessboard & Pieces (Satranç Tahtası)', say: 'I like playing chess with a chessboard.' },
+      { id: 'swim', act: 'swimming', icon: '🏊', tool: 'Goggles & Pool (Yüzme Gözlüğü ve Havuz)', say: 'I like swimming with my goggles.' },
+      { id: 'guitar', act: 'playing the guitar', icon: '🎸', tool: 'Guitar & Music Notes (Gitar ve Notalar)', say: 'I like playing the guitar and creating music.' },
+      { id: 'bike', act: 'riding a bike', icon: '🚲', tool: 'Bicycle & Helmet (Bisiklet ve Kask)', say: 'I like riding a bike with my helmet.' },
+      { id: 'kite', act: 'flying a kite', icon: '🪁', tool: 'Colorful Kite & String (Uçurtma ve İp)', say: 'I like flying a kite in the windy sky.' },
+      { id: 'comics', act: 'reading comics', icon: '📚', tool: 'Comic Books & Cartoons (Çizgi Roman Kitabı)', say: 'I like reading comic books.' }
+    ];
+
+    const leftItems = shuffle([...pairs]);
+    const rightItems = shuffle(pairs.map(p => ({ id: p.id, tool: p.tool })));
+
+    let selectedLeft = null;
+    let matchedPairs = 0;
+
+    function drawMatching() {
+      cardEl.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h5 class="text-xl font-bold text-orange-950">🧩 Hobby & Tool Matcher (Aktivite ve Araç Eşleştirme)</h5>
+              <p class="text-sm text-slate-600">Sol sütundan bir aktiviteye, ardından sağ sütundaki doğru araca dokun:</p>
+            </div>
+            <button type="button" class="chip !text-sm font-bold" id="match-u4-reset">Yeniden Karıştır 🎲</button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Left: Hobbies -->
+            <div class="space-y-2.5">
+              <div class="text-xs uppercase font-extrabold text-orange-800 tracking-wider mb-1">🎯 AKTİVİTELER (Hobbies):</div>
+              ${leftItems.map(item => `
+                <button type="button" class="opt flex items-center gap-3 w-full u4-match-left ${item.done ? '!bg-emerald-100 !border-emerald-500 !text-emerald-900 pointer-events-none' : ''} ${selectedLeft === item.id ? '!border-orange-500 !bg-orange-100 ring-2 ring-orange-400' : ''}" data-id="${item.id}">
+                  <span class="text-3xl">${item.icon}</span>
+                  <span class="font-bold text-base">${item.act}</span>
+                  ${item.done ? '<span class="ml-auto text-xl">✅</span>' : ''}
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- Right: Tools -->
+            <div class="space-y-2.5">
+              <div class="text-xs uppercase font-extrabold text-orange-800 tracking-wider mb-1">🛠️ ARAÇ VE GEREÇLER (Tools & Equipment):</div>
+              ${rightItems.map(item => `
+                <button type="button" class="opt flex items-center justify-between w-full u4-match-right ${item.done ? '!bg-emerald-100 !border-emerald-500 !text-emerald-900 pointer-events-none' : ''}" data-id="${item.id}">
+                  <span class="font-bold text-base text-slate-800">${item.tool}</span>
+                  ${item.done ? '<span class="text-xl">✅</span>' : '<span class="text-sm opacity-50">👉</span>'}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div id="u4-match-fb" class="p-3 rounded-xl text-base font-bold hidden"></div>
+        </div>
+      `;
+
+      $('#match-u4-reset', cardEl).onclick = () => renderMatching();
+
+      $$('.u4-match-left', cardEl).forEach(btn => {
+        btn.onclick = () => {
+          selectedLeft = btn.dataset.id;
+          const target = leftItems.find(x => x.id === selectedLeft);
+          if (target) say(target.act);
+          drawMatching();
+        };
+      });
+
+      $$('.u4-match-right', cardEl).forEach(btn => {
+        btn.onclick = () => {
+          if (!selectedLeft) {
+            toast('Önce sol sütundan bir hobi seçmelisin! 👈');
+            return;
+          }
+          const rightId = btn.dataset.id;
+          const fb = $('#u4-match-fb', cardEl);
+          fb.classList.remove('hidden');
+
+          if (selectedLeft === rightId) {
+            const lItem = leftItems.find(x => x.id === selectedLeft);
+            const rItem = rightItems.find(x => x.id === rightId);
+            lItem.done = true;
+            rItem.done = true;
+            selectedLeft = null;
+            matchedPairs++;
+            sfx.ok();
+            say(lItem.say);
+
+            if (matchedPairs === leftItems.length) {
+              fb.className = 'p-3 rounded-xl text-base font-bold bg-emerald-100 text-emerald-900 border-2 border-emerald-300';
+              fb.innerHTML = '🎉 Harika! 6 eşleştirmenin tümü doğru! ⭐ +2 Stars!';
+              game(2);
+            } else {
+              fb.className = 'p-3 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200';
+              fb.innerHTML = `✅ Doğru eşleşme: <b>${lItem.act} ➔ ${lItem.tool.split('(')[0]}</b>`;
+            }
+            drawMatching();
+          } else {
+            sfx.no();
+            fb.className = 'p-3 rounded-xl text-sm font-semibold bg-rose-50 text-rose-800 border border-rose-200 animate-shake';
+            fb.innerHTML = '❌ Eşleşmedi! Tekrar dene.';
+            selectedLeft = null;
+            setTimeout(drawMatching, 900);
+          }
+        };
+      });
+    }
+
+    drawMatching();
+  }
+
+  /* --- TAB 3: -ING & QUESTION GAPS --- */
+  function renderSentence() {
+    const questions = [
+      { q: 'I like ___ football with my friends on Saturdays. ⚽', say: 'I like playing football with my friends on Saturdays.', o: ['playing', 'play', 'plays'], c: 'playing', tr: "'like' tan sonra fiile -ing eklenir (play -> playing)." },
+      { q: 'Do you like ___ in the swimming pool? 🏊', say: 'Do you like swimming in the swimming pool?', o: ['swimming', 'swim', 'swims'], c: 'swimming', tr: "'swim' fiili -ing alırken 'm' harfi çift yazılır (swimming)." },
+      { q: 'Do you like reading comic books? — Yes, I ___ 📚', say: 'Do you like reading comic books? Yes, I do.', o: ['do', 'like', 'am'], c: 'do', tr: "'Do you...?' sorusuna olumlu kısa cevap: 'Yes, I do.'" },
+      { q: 'Do you like coloring pictures? — No, I ___ 🖍️', say: "Do you like coloring pictures? No, I don't.", o: ["don't", 'not', "doesn't"], c: "don't", tr: "'Do you...?' sorusuna olumsuz kısa cevap: 'No, I don't.'" },
+      { q: 'I like drawing, ___ I do not like skateboarding. 🎨🛹', say: "I like drawing, but I do not like skateboarding.", o: ['but', 'and', 'or'], c: 'but', tr: "Biri olumlu, biri olumsuz zıt fikirler için 'but' (ama) kullanılır." },
+      { q: 'She likes singing songs ___ playing the guitar. 🎤🎸', say: 'She likes singing songs and playing the guitar.', o: ['and', 'but', 'so'], c: 'and', tr: "İki sevilen hobiyi bağlarken 'and' (ve) kullanılır." },
+      { q: 'He likes ___ a bike in the park every weekend. 🚲', say: 'He likes riding a bike in the park every weekend.', o: ['riding', 'ride', 'rideing'], c: 'riding', tr: "'ride' fiili -ing alırken sondaki 'e' düşer (riding)." },
+      { q: 'Do you like doing jigsaw puzzles? — No, I ___ 🧩', say: "Do you like doing jigsaw puzzles? No, I don't.", o: ["don't", 'do', 'am not'], c: "don't", tr: "Olumsuz kısa cevap: 'No, I don't.'" }
+    ];
+
+    let answeredCount = 0;
+    let correctTotal = 0;
+
+    cardEl.innerHTML = `
+      <div class="space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h5 class="text-xl font-bold text-orange-950">✍️ -ING & Question Gap Filler (8 Soru)</h5>
+            <p class="text-sm text-slate-600">Her cümlenin boşluğuna uygun seçeneği işaretle:</p>
+          </div>
+          <button type="button" class="chip !text-sm font-bold" id="u4-sent-again">Yeniden Başla 🎲</button>
+        </div>
+
+        <div class="space-y-3">
+          ${questions.map((q, qidx) => `
+            <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3" data-qidx="${qidx}">
+              <div class="space-y-1">
+                <div class="text-base md:text-lg font-bold text-slate-800">${qidx + 1}. ${q.q}</div>
+                <div class="text-xs text-orange-800 font-semibold">💡 İpucu: ${q.tr}</div>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                ${q.o.map(opt => `
+                  <button type="button" class="btn-alt !py-1.5 !px-3.5 text-base font-bold u4-sent-opt" data-val="${opt}">
+                    ${opt}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div id="u4-sent-fb" class="p-3 rounded-xl text-base font-bold hidden"></div>
+      </div>
+    `;
+
+    $('#u4-sent-again', cardEl).onclick = () => renderSentence();
+
+    $$('.u4-sent-opt', cardEl).forEach(btn => {
+      btn.onclick = () => {
+        const parent = btn.closest('[data-qidx]');
+        const qidx = parseInt(parent.dataset.qidx, 10);
+        const q = questions[qidx];
+        const val = btn.dataset.val;
+
+        $$('.u4-sent-opt', parent).forEach(b => b.disabled = true);
+
+        if (val === q.c) {
+          btn.classList.remove('btn-alt');
+          btn.classList.add('!bg-emerald-500', '!text-white', '!border-emerald-600');
+          sfx.ok();
+          say(q.say);
+          correctTotal++;
+        } else {
+          btn.classList.remove('btn-alt');
+          btn.classList.add('!bg-rose-500', '!text-white', '!border-rose-600');
+          sfx.no();
+          $$('.u4-sent-opt', parent).forEach(b => {
+            if (b.dataset.val === q.c) {
+              b.classList.remove('btn-alt');
+              b.classList.add('!bg-emerald-500', '!text-white');
+            }
+          });
+        }
+
+        answeredCount++;
+        if (answeredCount === questions.length) {
+          const fb = $('#u4-sent-fb', cardEl);
+          fb.classList.remove('hidden');
+          if (correctTotal === questions.length) {
+            fb.className = 'p-3 rounded-xl text-base font-bold bg-emerald-100 text-emerald-900 border-2 border-emerald-300';
+            fb.innerHTML = `🎉 Harika! 8/8 cümlenin tümünü doğru tamamladın! ⭐ +2 Stars!`;
+            game(2);
+          } else {
+            fb.className = 'p-3 rounded-xl text-sm font-semibold bg-amber-100 text-amber-900 border-2 border-amber-300';
+            fb.innerHTML = `👏 Alıştırma bitti! Puanın: ${correctTotal}/${questions.length}.`;
+          }
+        }
+      };
+    });
+  }
+
+  /* --- TAB 4: INTERACTIVE SENTENCE BUILDER (8 PROGRESSIVE SENTENCES) --- */
+  function renderBuilder() {
+    const sentences = [
+      { words: ['I', 'like', 'playing', 'football', '.'], say: 'I like playing football.', tr: 'Futbol oynamayı severim.' },
+      { words: ['Do', 'you', 'like', 'swimming', '?'], say: 'Do you like swimming?', tr: 'Yüzmeyi sever misin?' },
+      { words: ['Yes', ',', 'I', 'do', '.'], say: 'Yes, I do.', tr: 'Evet, severim.' },
+      { words: ['No', ',', 'I', "don't", '.'], say: "No, I don't.", tr: 'Hayır, sevmem.' },
+      { words: ['She', 'likes', 'riding', 'a', 'bike', '.'], say: 'She likes riding a bike.', tr: 'O bisiklete binmeyi sever.' },
+      { words: ['I', "don't", 'like', 'playing', 'chess', '.'], say: "I don't like playing chess.", tr: 'Satranç oynamayı sevmem.' },
+      { words: ['I', 'like', 'drawing', 'and', 'coloring', '.'], say: 'I like drawing and coloring.', tr: 'Resim çizmeyi ve boyamayı severim.' },
+      { words: ['I', 'like', 'swimming', ',', 'but', 'I', "don't", 'like', 'skateboarding', '.'], say: "I like swimming, but I don't like skateboarding.", tr: 'Yüzmeyi severim ama kaykay kaymayı sevmem.' }
+    ];
+
+    let sIdx = 0;
+    let placedWords = [];
+
+    function drawSentence() {
+      const s = sentences[sIdx];
+      const targetTokens = [...s.words];
+      const pool = shuffle([...s.words]);
+
+      cardEl.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h5 class="text-xl font-bold text-orange-950">🧱 Sentence Builder Lab (Cümle Kurma Laboratuvarı)</h5>
+              <p class="text-sm text-slate-600">Kelimelere sırasıyla dokunarak doğru cümleyi oluştur:</p>
+            </div>
+            <span class="chip !bg-orange-100 !border-orange-400 font-bold text-sm">Cümle: ${sIdx + 1} / ${sentences.length}</span>
+          </div>
+
+          <!-- Sentence Target Slot -->
+          <div class="bg-white p-5 rounded-2xl border-3 border-orange-300 min-h-[90px] flex items-center justify-center flex-wrap gap-2 text-xl font-bold text-slate-800 shadow-inner" id="builder-slot">
+            ${placedWords.length ? placedWords.map((w, wIdx) => `
+              <button type="button" class="chip !bg-orange-500 !text-white !border-orange-600 font-bold text-base" data-unplace="${wIdx}">
+                ${w} ✕
+              </button>
+            `).join('') : '<span class="text-slate-400 font-medium text-base">Aşağıdaki kelimelere dokunarak cümleni kur…</span>'}
+          </div>
+
+          <div class="text-xs text-orange-800 font-semibold text-center">
+            🇹🇷 Hedef Türkçe Anlam: <b>"${s.tr}"</b>
+          </div>
+
+          <!-- Available Word Bank -->
+          <div class="bg-orange-50/80 p-4 rounded-2xl border-2 border-orange-200">
+            <div class="text-xs uppercase font-extrabold text-orange-900 tracking-wider mb-2">KULLANILABİLİR KELİMELER:</div>
+            <div class="flex flex-wrap gap-2 justify-center" id="builder-pool">
+              ${pool.map((w, pIdx) => `
+                <button type="button" class="chip !text-base font-bold builder-pool-chip" data-word="${w}">
+                  ${w}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-2">
+            <button type="button" class="btn !bg-emerald-600 text-base font-bold" id="builder-check-btn">Cümleyi Kontrol Et ✅</button>
+            <div id="builder-fb" class="text-base font-bold"></div>
+          </div>
+        </div>
+      `;
+
+      // Word click to place
+      $$('.builder-pool-chip', cardEl).forEach(btn => {
+        btn.onclick = () => {
+          placedWords.push(btn.dataset.word);
+          sfx.tick();
+          say(btn.dataset.word);
+          drawSentence();
+        };
+      });
+
+      // Word click to unplace
+      $$('[data-unplace]', cardEl).forEach(btn => {
+        btn.onclick = () => {
+          const uIdx = parseInt(btn.dataset.unplace, 10);
+          placedWords.splice(uIdx, 1);
+          sfx.tick();
+          drawSentence();
+        };
+      });
+
+      // Check button
+      $('#builder-check-btn', cardEl).onclick = () => {
+        const formed = placedWords.join(' ');
+        const target = s.words.join(' ');
+        const fb = $('#builder-fb', cardEl);
+
+        if (formed === target) {
+          fb.innerHTML = '<span class="text-emerald-700">🎉 Mükemmel Cümle! ⭐</span>';
+          sfx.ok();
+          say(s.say);
+          setTimeout(() => {
+            sIdx++;
+            placedWords = [];
+            if (sIdx >= sentences.length) {
+              game(3);
+              toast('🏆 Tebrikler! Tüm 8 cümleyi kurdun!');
+              sIdx = 0;
+            }
+            drawSentence();
+          }, 1500);
+        } else {
+          fb.innerHTML = '<span class="text-rose-700">❌ Kelime sırasını kontrol et ve tekrar dene!</span>';
+          sfx.no();
+        }
+      };
+    }
+
+    drawSentence();
+  }
+
+  // Initial render
+  renderMode();
+}
+
+/* --- UNIT 4: GRAND MASTER CHAMPIONSHIP (10-ROUND TOURNAMENT) --- */
+function freeTimeChamp(el) {
+  const questions = [
+    { q: 'I like ___ chess with my grandfather. ♟️', e: '♟️', say: 'I like playing chess with my grandfather.', o: ['playing', 'play', 'played', 'plays'], tr: "'like' sonrasında fiil -ing alır." },
+    { q: 'Do you like swimming? 🏊', e: '🏊', say: 'Do you like swimming? Yes, I do.', o: ['Yes, I do.', 'Yes, I like.', 'Yes, I am.', "No, I doesn't."], tr: "'Do you...?' sorusuna olumlu kısa cevap 'Yes, I do' dur." },
+    { q: 'I ___ like coloring pictures. 💔', e: '🖍️', say: "I don't like coloring pictures.", o: ["don't", "doesn't", 'not', 'no'], tr: "'I' öznesi için olumsuzluk 'don't' ile yapılır." },
+    { q: "I like drawing, ___ I don't like skateboarding. 🎨🛹", e: '⚖️', say: "I like drawing, but I don't like skateboarding.", o: ['but', 'and', 'because', 'so'], tr: "Zıt fikirler için 'but' (ama) kullanılır." },
+    { q: 'What is the correct spelling for "swim" with -ing? 🏊', e: '🔤', say: 'Swimming has double m: s-w-i-m-m-i-n-g.', o: ['swimming', 'swiming', 'swimimg', 'swimmng'], tr: "'swim' fiilinde 'm' harfi çift yazılır." },
+    { q: 'She likes ___ a horse in the village. 🐎', e: '🐎', say: 'She likes riding a horse in the village.', o: ['riding', 'rideing', 'ride', 'rides'], tr: "'ride' fiili -ing alırken 'e' harfi düşer." },
+    { q: 'Do you like playing the guitar? 🎸', e: '🎸', say: "Do you like playing the guitar? No, I don't.", o: ["No, I don't.", 'No, I not.', 'No, I do.', 'No, I am not.'], tr: "Olumsuz kısa cevap: 'No, I don't.'" },
+    { q: 'We like reading comics ___ watching cartoons together! 📚📺', e: '🤝', say: 'We like reading comics and watching cartoons together!', o: ['and', 'but', 'or', 'so'], tr: "İki sevilen hobiyi bağlarken 'and' kullanılır." },
+    { q: 'He ___ like playing computer games. 🎮', e: '🎮', say: "He doesn't like playing computer games.", o: ["doesn't", "don't", 'not', 'no'], tr: "'He/She/It' öznelerinde olumsuzluk 'doesn't' ile yapılır." },
+    { q: 'Which activity is a board game? 🎲', e: '🏆', say: 'Playing chess is a board game.', o: ['playing chess', 'swimming', 'riding a bike', 'skateboarding'], tr: "'playing chess' (satranç) bir masa/kutu oyunudur." }
+  ];
+
+  mcq(el, questions, { done: () => game(3) });
 }
 
 // --- UNIT 5: My Day ---
@@ -3972,9 +4630,10 @@ const UNITS = [
     n: 4,
     name: 'Free Time',
     icon: '🎨',
+    hasTrGuide: true,
     th: ['#f97316', '#fb7185', '#c2410c', '#ffedd5'],
-    concept: "Like / don't like + verb-ing, and Do you like…?",
-    tip: 'Remember the -ING rule! After "like" or "don\'t like", add -ing: I like playING chess, I don\'t like drawING!',
+    concept: "Like / don't like + verb-ing, Do you like...?, and sentence connectors (and / but)",
+    tip: 'Remember the -ING rule! After "like" or "don\'t like", always add -ing: I like playING football, I don\'t like drawING!',
     story: {
       title: 'The Weekend Hobby Club',
       panels: [
@@ -3998,23 +4657,28 @@ const UNITS = [
       ]
     },
     vocab: [
-      ['Hobbies & Activities', HOBBIES.map(h => [h[1], h[0], `I like ${h[0]}.`, h[2]])]
+      ['Hobbies & Activities (16 Serbest Zaman Aktivitesi)', HOBBIES.map(h => [h[1], h[0], `I like ${h[0]}.`, h[2]])]
     ],
     gram: [
       {
-        t: 'Preferences with -ING',
+        t: '1. Preferences with -ING',
         f: ['I like / I don\'t like', '+ verb-ING'],
-        ex: ['I like playing chess.', "I don't like coloring.", 'She likes drawing cartoons.']
+        ex: ['I like playing football.', "I don't like coloring.", 'She likes drawing cartoons.']
       },
       {
-        t: 'Questions with "Do you like…?"',
+        t: '2. Questions with "Do you like…?"',
         f: ['Do you like', '+ verb-ING', '?'],
-        ex: ['Do you like riding a horse?', 'Do you like reading comics?']
+        ex: ['Do you like riding a bike?', 'Do you like reading comics?', 'Do you like swimming?']
       },
       {
-        t: 'Short Answers',
-        f: ['Yes, I do.', 'No, I don\'t.'],
+        t: '3. Short Answers (Kısa Cevaplar)',
+        f: ['Yes, I do. 😊', 'No, I don\'t. 🙁'],
         ex: ['Do you like swimming? Yes, I do.', "Do you like table tennis? No, I don't."]
+      },
+      {
+        t: '4. Connectors: "and" & "but"',
+        f: ['like A + and + like B', 'like A + , but + don\'t like B'],
+        ex: ['I like drawing and coloring.', "I like swimming, but I don't like skateboarding."]
       }
     ],
     lab: [
@@ -4023,40 +4687,50 @@ const UNITS = [
         ch: ['Yes, I do. I like playing chess.', 'Yes, I like play chess.', "No, I doesn't like."]
       },
       {
-        npc: 'What about outdoor sports? Do you like riding a horse?',
-        ch: ["No, I don't, but I like riding a bike.", 'I no like horse.', 'Yes, I am horse.']
+        npc: 'What about outdoor sports? Do you like riding a bike?',
+        ch: ['Yes, I do. I like riding a bike.', 'I no like bike.', 'Yes, I am bicycle.']
       },
       {
-        npc: 'Great! Do you like reading comic books?',
-        ch: ['Yes, I do! I love superhero comics.', 'Yes, I reading.', 'No comics I am.']
+        npc: 'Great! Do you like reading comic books or playing guitar?',
+        ch: ['I like reading comics, but I do not like guitar.', 'I like play guitar and read.', 'No comics I am.']
       }
     ],
     acts: [
-      ['fi', '🎤', 'Friend Interviewer', interviewer],
-      ['wh', '🎡', 'Hobby Wheel', wheel],
+      ['champ', '🏆', 'Grand Championship (Büyük Şampiyona)', freeTimeChamp],
+      ['fi', '🎤', 'Friend Interviewer & Survey', interviewer],
+      ['wh', '🎡', '16-Hobby Lucky Wheel', wheel],
       ['lg', '🎧', 'Listening Gym', el => listeningGym(el, [
         { phrase: 'I like playing computer games.', correct: 'Computer games', correctImg: '🎮', wrong: [{ text: 'Drawing', img: '✏️' }, { text: 'Reading comics', img: '📚' }] },
         { phrase: 'I do not like coloring.', correct: 'Coloring', correctImg: '🖍️', wrong: [{ text: 'Table tennis', img: '🏓' }, { text: 'Horse riding', img: '🐎' }] },
-        { phrase: 'Do you like playing chess? Yes, I do.', correct: 'Chess', correctImg: '♟️', wrong: [{ text: 'Watching TV', img: '📺' }, { text: 'Drawing', img: '🎨' }] }
-      ], { done: () => game() })],
+        { phrase: 'Do you like playing chess? Yes, I do.', correct: 'Chess', correctImg: '♟️', wrong: [{ text: 'Watching TV', img: '📺' }, { text: 'Drawing', img: '🎨' }] },
+        { phrase: 'I like swimming in the pool.', correct: 'Swimming', correctImg: '🏊', wrong: [{ text: 'Skateboarding', img: '🛹' }, { text: 'Guitar', img: '🎸' }] },
+        { phrase: 'She likes riding a bike in the park.', correct: 'Riding a bike', correctImg: '🚲', wrong: [{ text: 'Flying a kite', img: '🪁' }, { text: 'Puzzles', img: '🧩' }] }
+      ], { done: () => game(2) })],
       ['bee', '🔤', 'Spelling Bee', el => spellingBee(el, [
+        { w: 'swimming', e: '🏊', clue: 'Moving in water with double m', hint: 'S - W - I - M - M - I - N - G' },
         { w: 'drawing', e: '✏️', clue: 'Making art with a pencil', hint: 'D - R - A - W - I - N - G' },
-        { w: 'chess', e: '♟️', clue: 'Board game with king & queen', hint: 'C - H - E - S - S' },
+        { w: 'guitar', e: '🎸', clue: 'Musical string instrument', hint: 'G - U - I - T - A - R' },
+        { w: 'riding', e: '🚲', clue: 'Cycling on a bike', hint: 'R - I - D - I - N - G' },
+        { w: 'puzzles', e: '🧩', clue: 'Connecting jigsaw pieces', hint: 'P - U - Z - Z - L - E - S' },
         { w: 'comics', e: '📚', clue: 'Fun cartoon reading books', hint: 'C - O - M - I - C - S' }
-      ], { done: () => game() })],
+      ], { done: () => game(2) })],
       ['gd', '🕵️', 'Grammar Detective', el => grammarDetective(el, [
         { broken: 'I like play chess.', fixed: 'I like playing chess.', wrong1: 'I likes playing chess.', wrong2: 'I liking play chess.' },
         { broken: 'Do you likes drawing?', fixed: 'Do you like drawing?', wrong1: 'Are you like drawing?', wrong2: 'Does you like drawing?' },
-        { broken: "No, I doesn't.", fixed: "No, I don't.", wrong1: 'No, I not do.', wrong2: "No, I can't do." }
-      ], { done: () => game() })],
+        { broken: "No, I doesn't.", fixed: "No, I don't.", wrong1: 'No, I not do.', wrong2: "No, I can't do." },
+        { broken: 'She like swimming.', fixed: 'She likes swimming.', wrong1: 'She liking swimming.', wrong2: 'She is likes swimming.' },
+        { broken: "I like draw, but I don't like coloring.", fixed: "I like drawing, but I don't like coloring.", wrong1: "I like draw and color.", wrong2: "I likes drawing, but coloring." }
+      ], { done: () => game(2) })],
       ['sb', '🧱', 'Sentence Builder', el => builder(el, [
-        'I like playing chess',
-        "I don't like coloring",
-        'Do you like drawing',
+        'I like playing football',
+        'Do you like swimming',
         'Yes I do',
         "No I don't",
-        'I like reading comics'
-      ], { done: () => game() })]
+        'She likes riding a bike',
+        "I don't like playing chess",
+        'I like drawing and coloring',
+        "I like swimming but I don't like skateboarding"
+      ], { done: () => game(3) })]
     ],
     quiz: [
       { q: 'I like ___ chess.', e: '♟️', o: ['playing', 'play', 'plays'] },
@@ -4254,6 +4928,54 @@ function show(i) {
       </button>
     </section>
 
+    ${i === 3 ? `
+      <!-- UNIT 4: 3-LESSON CURRICULUM ROADMAP (3 DERSLİK MÜFREDAT PLANI) -->
+      <section class="card p-5 bg-gradient-to-r from-orange-100 via-amber-50 to-rose-50 border-3 border-orange-300 rounded-3xl shadow-sm space-y-3" id="u4-roadmap">
+        <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-orange-200">
+          <div class="flex items-center gap-2">
+            <span class="text-3xl">📅</span>
+            <div>
+              <h3 class="font-extrabold text-orange-950 text-xl">Unit 4: 3 Lessons of 60 Minutes Curriculum Plan (3 Derslik Müfredat)</h3>
+              <p class="text-xs md:text-sm text-orange-800 font-semibold">Toplam 180 dakikalık modüler ünite planı ve pedagojik hedefleri</p>
+            </div>
+          </div>
+          <span class="chip !bg-orange-200 !text-orange-900 !border-orange-400 font-bold text-xs">Toplam Süre: 3x60 Dk</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 space-y-2 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-orange-900 text-base">📚 Lesson 1 (60 Dk)</span>
+              <span class="badge text-xs bg-orange-100 text-orange-800 font-bold px-2 py-0.5 rounded-full">Kelime & -ING</span>
+            </div>
+            <p class="text-xs text-slate-700 font-medium">16 Hobi aktivitesi, "I like / I don't like" tercih kalıbı ve sihirli -ING ekleme kuralı.</p>
+            <div class="text-[11px] text-orange-800 font-bold bg-orange-50 p-2 rounded-xl border border-orange-200">
+              🎯 <b>Etkinlikler:</b> 16 Flaşkart, Araç Eşleştirme, Hobi Sıralama
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border-2 border-amber-300 space-y-2 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-amber-900 text-base">🎤 Lesson 2 (60 Dk)</span>
+              <span class="badge text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">Soru & Anket</span>
+            </div>
+            <p class="text-xs text-slate-700 font-medium">"Do you like...?" soru kalıbı, "Yes, I do / No, I don't" kısa cevapları ve sınıf anketi.</p>
+            <div class="text-[11px] text-amber-800 font-bold bg-amber-50 p-2 rounded-xl border border-amber-200">
+              🎯 <b>Etkinlikler:</b> Canlı Sınıf Anketi, Çarkıfelek, Diyalog Rolü
+            </div>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border-2 border-rose-300 space-y-2 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-rose-900 text-base">🏆 Lesson 3 (60 Dk)</span>
+              <span class="badge text-xs bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">Cümle & Şampiyona</span>
+            </div>
+            <p class="text-xs text-slate-700 font-medium">"and" & "but" bağlaçları, 8 Cümle kurma laboratuvarı ve 10 turluk Büyük Şampiyona.</p>
+            <div class="text-[11px] text-rose-800 font-bold bg-rose-50 p-2 rounded-xl border border-rose-200">
+              🎯 <b>Etkinlikler:</b> Cümle Kurucu, Hikaye Boşlukları, Şampiyona
+            </div>
+          </div>
+        </div>
+      </section>
+    ` : ''}
+
     <!-- 2. MINI COMIC STORY CORNER -->
     <section class="card p-5 md:p-6 bg-white" aria-labelledby="story-title">
       <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
@@ -4358,6 +5080,27 @@ function show(i) {
             <div id="cqc-card" class="space-y-4"></div>
           </div>
         ` : ''}
+        ${i === 3 && gidx === 0 ? `
+          <!-- INTERACTIVE 3-LESSON PRACTICE HUB RIGHT AFTER 16 HOBBIES FLASHCARDS -->
+          <div class="mt-8 card p-5 md:p-6 bg-gradient-to-br from-orange-50 via-white to-amber-50 border-4 border-orange-400 shadow-lg text-left" id="u4-practice-hub">
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-4 pb-3 border-b-2 border-orange-200">
+              <div class="flex items-center gap-2.5">
+                <span class="text-3xl wig inline-block">🎨</span>
+                <div>
+                  <h4 class="text-xl md:text-2xl font-extrabold text-orange-950">Free Time 3-Lesson Practice Hub</h4>
+                  <p class="text-sm text-orange-800 font-medium">3 Derslik Hobi Kulübü: Okuma, Eşleştirme, Cümle Kurma ve Boşluk Doldurma</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 flex-wrap" id="u4-hub-tabs">
+                <button type="button" class="tab !py-1.5 !px-3 text-sm font-bold on u4-hub-tab" data-mode="reading">📖 Story & Gaps</button>
+                <button type="button" class="tab !py-1.5 !px-3 text-sm font-bold u4-hub-tab" data-mode="matching">🧩 Tool Matcher</button>
+                <button type="button" class="tab !py-1.5 !px-3 text-sm font-bold u4-hub-tab" data-mode="sentence">✍️ -ING Gaps</button>
+                <button type="button" class="tab !py-1.5 !px-3 text-sm font-bold u4-hub-tab" data-mode="builder">🧱 Sentence Builder</button>
+              </div>
+            </div>
+            <div id="u4-hub-card" class="space-y-4"></div>
+          </div>
+        ` : ''}
       `).join('')}
     </section>
 
@@ -4382,7 +5125,7 @@ function show(i) {
     </section>
 
     <!-- SPECIAL TURKISH ASSISTANCE GUIDE FOR UNIT 2 -->
-    ${u.hasTrGuide ? `
+    ${i === 1 && u.hasTrGuide ? `
     <section class="card p-5 md:p-6 bg-gradient-to-br from-white to-sky-50 border-4 border-sky-400 shadow-md" aria-labelledby="tr-guide-title">
       <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b-2 border-sky-200">
         <div class="flex items-center gap-2">
@@ -4495,6 +5238,116 @@ function show(i) {
     </section>
     ` : ''}
 
+    <!-- SPECIAL TURKISH ASSISTANCE GUIDE FOR UNIT 4 -->
+    ${i === 3 && u.hasTrGuide ? `
+    <section class="card p-5 md:p-6 bg-gradient-to-br from-white to-orange-50 border-4 border-orange-400 shadow-md" aria-labelledby="u4-tr-guide-title">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b-2 border-orange-200">
+        <div class="flex items-center gap-2">
+          <span class="text-3xl wig inline-block">🇹🇷</span>
+          <div>
+            <h2 id="u4-tr-guide-title" class="text-xl md:text-2xl font-extrabold text-orange-950">Unit 4: Türkçe Konu Anlatımı & Hobi Rehberi</h2>
+            <p class="text-sm md:text-base text-orange-900 font-medium">Like / Don't Like kuralları, -ing ekleme kuralları, Do you like soruları ve and / but bağlaçları</p>
+          </div>
+        </div>
+        <button type="button" class="btn !bg-orange-600 !text-sm !py-2 !px-3.5 shadow font-bold" id="u4-tr-guide-read-btn">🔊 Sesli Özeti Dinle</button>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 text-left">
+        <!-- Kural 1: -ING Kuralı -->
+        <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 shadow-sm space-y-2.5">
+          <div class="flex items-center gap-2 font-bold text-orange-950 text-lg">
+            <span>🎯</span> <span>1. "Like / Don't Like" ve -ING Kuralı</span>
+          </div>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            İngilizce'de bir eylemi yapmayı sevdiğimizi veya sevmediğimizi söylerken, <b>like</b> ve <b>don't like</b> ifadelerinden sonra gelen fiile mutlaka <b>-ing</b> takısı eklenir:
+          </p>
+          <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-xl text-sm space-y-1.5">
+            <div>👍 <b>Sevilen Şeyler:</b> <code class="bg-white px-1.5 py-0.5 rounded font-bold text-emerald-800">I like + Verb-ing</code></div>
+            <div class="text-slate-600 pl-4">Örnek: <i>"I like <b>swimming</b>."</i> (Yüzmeyi severim.)</div>
+            <div>👎 <b>Sevilmeyen Şeyler:</b> <code class="bg-white px-1.5 py-0.5 rounded font-bold text-rose-800">I don't like + Verb-ing</code></div>
+            <div class="text-slate-600 pl-4">Örnek: <i>"I don't like <b>coloring</b>."</i> (Boyama yapmayı sevmem.)</div>
+          </div>
+          <div class="bg-rose-50 border border-rose-200 p-2 rounded-xl text-xs text-rose-800 font-semibold">
+            ⚠️ <b>ÖNEMLİ YAZIM KURALI:</b> 
+            <br>• Sonu 'e' ile biten fiillerde 'e' düşer: <i>ride ➔ rid<b>ing</b></i>.
+            <br>• Kısa sesli + sessiz harfle bitenlerde son harf ikilenir: <i>swim ➔ swim<b>ming</b></i>.
+          </div>
+        </div>
+
+        <!-- Kural 2: Do you like...? Soruları ve Kısa Cevaplar -->
+        <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 shadow-sm space-y-2.5">
+          <div class="flex items-center gap-2 font-bold text-orange-950 text-lg">
+            <span>❓</span> <span>2. "Do you like...?" Sorusu ve Kısa Cevaplar</span>
+          </div>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            Karşımızdaki kişiye bir hobiyi sevip sevmediğini sorarken ve cevap verirken bu kalıbı kullanırız:
+          </p>
+          <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-sm space-y-2">
+            <div>
+              <span class="font-bold text-sky-900">Soru:</span> <i>"<b>Do you like</b> playing chess?"</i> (Satranç oynamayı sever misin?)
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-emerald-100 border border-emerald-300 rounded font-bold text-emerald-800">✅ Olumlu:</span>
+              <i>"<b>Yes, I do.</b>"</i> (Evet, severim.)
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-rose-100 border border-rose-300 rounded font-bold text-rose-800">❌ Olumsuz:</span>
+              <i>"<b>No, I don't.</b>"</i> (Hayır, sevmem.)
+            </div>
+          </div>
+          <div class="bg-amber-50 border border-amber-300 p-2 rounded-xl text-xs text-amber-900 font-semibold">
+            💡 <b>DİKKAT:</b> <i>"Yes, I like"</i> ❌ <u>yanlıştır</u>! Kısa cevapta her zaman yardımcı fiil (do/don't) kullanılır: <i>"Yes, I do"</i> ✅.
+          </div>
+        </div>
+
+        <!-- Kural 3: Bağlaçlar: AND & BUT -->
+        <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 shadow-sm space-y-2.5">
+          <div class="flex items-center gap-2 font-bold text-orange-950 text-lg">
+            <span>🔗</span> <span>3. Cümleleri Bağlama: "AND" (ve) & "BUT" (fakat/ama)</span>
+          </div>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            Birden fazla hobiden bahsederken cümleleri birbirine bağlarız:
+          </p>
+          <div class="space-y-2 text-sm">
+            <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200">
+              <b class="text-emerald-800">➕ AND (Ve) - İki Benzer Fikir:</b>
+              <p class="text-xs text-slate-600 mt-1">İki sevdiğimiz veya iki sevmediğimiz hobiyi bağlarken kullanılır:</p>
+              <div class="mt-1 font-semibold text-emerald-950">"I like swimming <b>and</b> riding a bike."</div>
+            </div>
+            <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-200">
+              <b class="text-rose-800">⚖️ BUT (Ama / Fakat) - Tezat / Zıt Fikir:</b>
+              <p class="text-xs text-slate-600 mt-1">Bir sevdiğimiz, bir sevmediğimiz hobiyi birleştirirken kullanılır:</p>
+              <div class="mt-1 font-semibold text-rose-950">"I like swimming, <b>but</b> I don't like skateboarding."</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kural 4: 16 Hobi Sözlüğü ve Eylemler -->
+        <div class="bg-white p-4 rounded-2xl border-2 border-orange-300 shadow-sm space-y-2.5">
+          <div class="flex items-center gap-2 font-bold text-orange-950 text-lg">
+            <span>📖</span> <span>4. 16 Temel Hobi ve Türkçe Anlamları</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 text-xs font-semibold">
+            <div class="p-1.5 bg-slate-50 rounded">♟️ playing chess: satranç</div>
+            <div class="p-1.5 bg-slate-50 rounded">🏓 table tennis: masa tenisi</div>
+            <div class="p-1.5 bg-slate-50 rounded">🎮 computer games: bilgisayar</div>
+            <div class="p-1.5 bg-slate-50 rounded">📺 watching cartoons: çizgi film</div>
+            <div class="p-1.5 bg-slate-50 rounded">📚 reading comics: çizgi roman</div>
+            <div class="p-1.5 bg-slate-50 rounded">🎨 drawing / coloring: boyama</div>
+            <div class="p-1.5 bg-slate-50 rounded">🐴 riding a horse: ata binme</div>
+            <div class="p-1.5 bg-slate-50 rounded">⚽ playing football: futbol</div>
+            <div class="p-1.5 bg-slate-50 rounded">🏊 swimming: yüzme</div>
+            <div class="p-1.5 bg-slate-50 rounded">🚲 riding a bike: bisiklet</div>
+            <div class="p-1.5 bg-slate-50 rounded">🎸 playing the guitar: gitar</div>
+            <div class="p-1.5 bg-slate-50 rounded">🪁 flying a kite: uçurtma</div>
+            <div class="p-1.5 bg-slate-50 rounded">🎤 singing songs: şarkı söyleme</div>
+            <div class="p-1.5 bg-slate-50 rounded">🛹 skateboarding: kaykay</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    ` : ''}
+
     <!-- 6. SPEAKING LAB -->
     <section aria-labelledby="st">
       <h2 id="st" class="sec-title mb-3">🎤 Speaking Lab: Interactive Role-Play</h2>
@@ -4518,12 +5371,25 @@ function show(i) {
   initQuickCountriesExercise($('#country-quick-challenge'));
   initWorldMapCompass($('#world-compass-hub'));
 
+  // Initialize Unit 4 3-Lesson Practice Hub
+  if (i === 3) {
+    initUnit4PracticeHub($('#u4-practice-hub'));
+  }
+
   // Hook up Turkish Guide Readout Button if present
   const trGuideBtn = $('#tr-guide-read-btn');
   if (trGuideBtn) {
     trGuideBtn.onclick = () => {
       say('Unit 2: Countries and Nationalities. Remember: I am from Türkiye, I am Turkish. He is from Britain, he is British. Samsun is in the north, Antalya is in the south, Van is in the east, and İzmir is in the west. Always use capital letters!');
       toast('🔊 Reading Unit 2 English summary!');
+    };
+  }
+
+  const u4TrGuideBtn = $('#u4-tr-guide-read-btn');
+  if (u4TrGuideBtn) {
+    u4TrGuideBtn.onclick = () => {
+      say('Unit 4: Free Time and Hobbies. After like and don\'t like, we add i-n-g to the verb. I like swimming, I don\'t like skateboarding. Do you like reading comics? Yes, I do! No, I don\'t. We use and for similar things, and but for opposites.');
+      toast('🔊 Reading Unit 4 English summary!');
     };
   }
 
